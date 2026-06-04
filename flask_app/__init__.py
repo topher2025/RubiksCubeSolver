@@ -22,6 +22,10 @@ def create_app(test_config=None):
     from . import auth
     app.register_blueprint(auth.bp)
 
+    from . import cube
+    app.register_blueprint(cube.bp)
+    app.add_url_rule('/', endpoint='index')
+
 
     @app.route('/hello')
     def hello():

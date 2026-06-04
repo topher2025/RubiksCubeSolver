@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <p>Have a shared code? <a href="{{ url_for('cube.flat_string') }}">Click Here!</a></p>
+    <p>Have a physical cube? <a href="{{ url_for('cube.pics') }}">Click Here!</a></p>
+
+    {% if g.user %}
+        {% if cubes %}
+            {% for cube in cubes %}
+                <div class="cube">
+                    <p> {{ cube['last_used'] }}</p>
+                    <p> {{ cube['flat_string'] }}</p>
+                    <a href="{{ url_for('cube.flat_string', flat_string=cube['flat_string']) }}">Solve</a>
+                </div>
+                {% if not loop.last %}
+                    <hr>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <p>You havn't added any cubes yet.</p>
+        {% endif %}
+    {% endif %}
+{% endblock %}

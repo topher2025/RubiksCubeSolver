@@ -1,5 +1,9 @@
-from rubik import cube
-from rubik.maths import Point
+try:
+    from . import cube
+    from .maths import Point
+except ImportError:
+    from rubik import cube
+    from rubik.maths import Point
 
 DEBUG = False
 
