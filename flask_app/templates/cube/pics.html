@@ -1,7 +1,16 @@
 {% extends 'base.html' %}
 
+
 {% block title %}Solve by Picture{% endblock %}
 
 {% block content %}
     <p>Hello World</p>
+
+    <form id="pics-form" action="{{ url_for('cube.pics') }}" method="post" enctype="multipart/form-data">
+        <input id="file-input" name="images" type="file" accept=".jpg,.jpeg,.png" multiple capture="environment">
+        <div id="file-errors" class="flash" style="display:none"></div>
+        <button id="submit-btn" type="submit">Upload</button>
+    </form>
+
+    <script src="{{ url_for('static', filename='pics.js') }}"></script>
 {% endblock %}

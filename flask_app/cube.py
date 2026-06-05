@@ -9,7 +9,46 @@ from flask_app.db import get_db
 from third_party.cube_main.rubik.cube import Cube
 from third_party.cube_main.rubik.solve import Solver
 
+from vision.rubiks import solve
+
 bp = Blueprint('cube', __name__)
+
+MAX_FILES = 3
+MAX_FILE_SIZE = 5 * 1024 * 1024
+ALLOWED_MIME = {'image/jpeg', 'image/png'}
+ALLOWED_EXT = {'.jpg', '.jpeg', '.png'}
+
+
+def _validate_uploaded_files(files):
+    errors = []
+
+    if not files:
+        errors.append('Please select at least one image.')
+        return errors
+
+    if len(files) > MAX_FILES:
+        errors.append(f'Maximum {MAX_FILES} files allowed. You selected {len(files)}.')
+
+    for file in files:
+        filename = (file.filename or '').strip()
+        if not filename:
+            errors.append('Each uploaded file must have a filename.')
+            continue
+
+        lower_name = filename.lower()
+        if not any(lower_name.endswith(ext) for ext in ALLOWED_EXT):
+            errors.append(f'File "{filename}" has unsupported extension.')
+
+        if file.mimetype and file.mimetype not in ALLOWED_MIME:
+            errors.append(f'File "{filename}" has unsupported type {file.mimetype}.')
+
+        file.stream.seek(0, 2)
+        size = file.stream.tell()
+        file.stream.seek(0)
+        if size > MAX_FILE_SIZE:
+            errors.append(f'File "{filename}" exceeds 5.0 MB limit.')
+
+    return errors
 
 
 @bp.route('/')
@@ -40,9 +79,18 @@ def flat_string():
 @bp.route('/pics', methods=('GET', 'POST'))
 def pics():
     if request.method == 'POST':
-        pass
+        files = request.files.getlist('images')
+        errors = _validate_uploaded_files(files)
+        if errors:
+            for error in errors:
+                flash(error)
+            return render_template('cube/pics.html')
+
+        cube = solve(*files)
+        flat_string = cube.flat_str()
+        return redirect(url_for('cube.solution', fs=flat_string))
     
-    return render_template('cube/pic.html')
+    return render_template('cube/pics.html')
 
 
 @bp.route('/solution')
