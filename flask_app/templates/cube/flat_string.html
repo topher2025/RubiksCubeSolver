@@ -1,21 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}Solution{% endblock %}
+{% block title %}Cube Flat String{% endblock %}
 
 {% block content %}
-    {% if flat_string %}
-        <p>Original cube: {{ flat_string }}</p>
-        {% if solution %}
-            {% for step in solution %}
-                <div>
-                    <p>{{ step }}</p>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% else %}
-        <form>
-            <label for="fs">Cube ID/Flat String:</label><br>
-            <input type="text" id="fs" name="fs" value="YYOGBORRRRBBGGGWBGBRBWOYWGOGRBYYOWOOWRGWBOYWYYWOYWRRGB"><br>
-        </form>
-    {% endif %}
+    <form>
+        <label for="fs">Cube ID/Flat String:</label><br>
+        <input type="text" id="fs" name="fs" value="YYOGBORRRRBBGGGWBGBRBWOYWGOGRBYYOWOOWRGWBOYWYYWOYWRRGB"><br>
+        <input type="submit" value="Solve">
+    </form>
 {% endblock %}

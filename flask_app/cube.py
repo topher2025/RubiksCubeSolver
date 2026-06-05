@@ -30,17 +30,72 @@ def index():
 
 @bp.route('/flat_string')
 def flat_string():
-    flat_string = request.args.get('flat_string')
-    solution = None
+    flat_string = request.args.get('fs')
     if flat_string:
+        return redirect(url_for('cube.solution', fs=flat_string))
+        
+    return render_template('cube/flat_string.html')
+
+
+@bp.route('/pics', methods=('GET', 'POST'))
+def pics():
+    if request.method == 'POST':
+        pass
+    
+    return render_template('cube/pic.html')
+
+
+@bp.route('/solution')
+def solution():
+    error = None
+    try:
+        flat_string = request.args.get('fs')
         cube = Cube(flat_string)
         solver = Solver(cube)
         solver.solve()
         solution = solver.moves
+        return render_template('cube/solution.html', solution=solution, fs=flat_string)
+    except:
+        error = "The cube you entered is invalid"
+        flash(error)
+        return render_template('cube/solution.html', e=error)
+    
 
-    return render_template('cube/flat_string.html', flat_string=flat_string, solution=solution)
+@bp.route('/save')
+@login_required
+def save():    
+    db = get_db()
+    flat_string = request.args.get('fs')
+    if not flat_string:
+        flash("No cube provided")
+        return redirect(request.referrer or url_for('cube.index'))
 
+    cube = db.execute(
+        'SELECT id FROM cubes WHERE flat_string = ?',
+        (flat_string,)
+    ).fetchone()
+    if cube is None:
+        cur = db.execute(
+            'INSERT INTO cubes (flat_string) VALUES (?)',
+            (flat_string,)
+        )
+        cube_id = cur.lastrowid
+    else:
+        cube_id = cube['id']
 
-@bp.route('/pics')
-def pics():
-    return render_template('cube/pic.html')
+    already_saved = db.execute(
+        'SELECT 1 FROM user_cubes WHERE user_id = ? AND cube_id = ?',
+        (g.user['id'], cube_id)
+    ).fetchone()
+    if already_saved:
+        flash('You already saved this cube')
+        return redirect(request.referrer or url_for('cube.index'))
+
+    db.execute(
+        'INSERT INTO user_cubes (user_id, cube_id, last_used) VALUES (?, ?, CURRENT_TIMESTAMP);',
+        (g.user['id'], cube_id)
+    )
+    db.commit()
+
+    flash('Cube saved')
+    return redirect(request.referrer or url_for('cube.index'))

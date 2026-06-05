@@ -10,7 +10,7 @@ CREATE TABLE users (
 
 CREATE TABLE cubes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    flat_string TEXT
+    flat_string TEXT UNIQUE
 );
 
 CREATE TABLE user_cubes (

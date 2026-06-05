@@ -7,7 +7,7 @@
 </head>
 <body>
     <nav>
-        <h1>Rubiks Solver</h1>
+        <h1><a href="{{ url_for('cube.index') }}">Rubiks Solver</a></h1>
         <ul>
             {% if g.user %}
                 <li><span>{{ g.user['username'] }}</span></li>

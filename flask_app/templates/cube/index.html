@@ -7,12 +7,13 @@
     <p>Have a physical cube? <a href="{{ url_for('cube.pics') }}">Click Here!</a></p>
 
     {% if g.user %}
+        <hr>
         {% if cubes %}
             {% for cube in cubes %}
                 <div class="cube">
                     <p> {{ cube['last_used'] }}</p>
                     <p> {{ cube['flat_string'] }}</p>
-                    <a href="{{ url_for('cube.flat_string', flat_string=cube['flat_string']) }}">Solve</a>
+                    <a href="{{ url_for('cube.solution', fs=cube['flat_string']) }}">Solve</a>
                 </div>
                 {% if not loop.last %}
                     <hr>
